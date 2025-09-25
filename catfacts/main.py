@@ -5,6 +5,9 @@ import importlib
 import requests
 
 from pathlib import Path
+from rich.console import Console
+from rich.panel import Panel
+from rich import box
 from pydantic import BaseModel
 from pydantic import field_validator
 from pydantic_settings import BaseSettings
@@ -31,6 +34,11 @@ class ApiResponse(TypedDict):
 class Fact(BaseModel):
     fact: str
 
+    @field_validator("fact", mode="after")
+    @classmethod
+    def highlight_cats(cls, v: str) -> str:
+        return re_cat.sub(r"[bold gold1]\g<0>[/bold gold1]", v)
+
     @classmethod
     def from_api(cls, data: ApiResponse) -> Self:
         return cls(fact=data["data"][0])
@@ -48,7 +56,10 @@ def get_a_fact() -> Fact:
 
 def main():
     fact = get_a_fact()
-    print(fact.fact)
+
+    console = Console()
+    panel = Panel(fact.fact, box=box.ROUNDED, border_style="red")
+    console.print(panel)
 
 
 if __name__ == "__main__":
