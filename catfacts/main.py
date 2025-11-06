@@ -1,3 +1,5 @@
+# pyright: reportUnusedCallResult=false
+import argparse
 import random
 import re
 import importlib
@@ -47,6 +49,13 @@ class Fact(BaseModel):
 settings = Settings()
 
 
+def get_a_cat() -> str:
+    with importlib.resources.path("catfacts", "cats") as path:
+        img = random.choice(list(Path(path).glob("*.txt")))
+        with img.open("r") as fd:
+            return fd.read()
+
+
 def get_a_fact() -> Fact:
     res = requests.get(settings.url)
     res.raise_for_status()
@@ -54,12 +63,26 @@ def get_a_fact() -> Fact:
     return fact
 
 
+class Args(argparse.Namespace):
+    cat: bool = False
+
+
+def parse_args():
+    p = argparse.ArgumentParser()
+    p.add_argument("--cat", "-c", action="store_true", help="Display an ASCII art cat")
+    return p.parse_args(namespace=Args)
+
+
 def main():
+    args = parse_args()
     fact = get_a_fact()
+    cat = get_a_cat()
 
     console = Console()
     panel = Panel(fact.fact, box=box.ROUNDED, border_style="red")
     console.print(panel)
+    if args.cat:
+        console.print(cat)
 
 
 if __name__ == "__main__":
