@@ -1,0 +1,20 @@
+[project]
+name = "catfacts-demo"
+version = "0.1.1"
+description = "Display cat facts"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+  "pydantic>=2.11.9",
+  "pydantic-settings>=2.11.0",
+  "requests>=2.32.5",
+]
+
+[project.scripts]
+catfacts = "catfacts.main:main"
+
+# Setting tool.uv.package=true means that running "uv sync" will 
+# install this project into its own virtual environment (so that e.g.
+# `uv run` will be able to run scripts defined in this file).
+[tool.uv]
+package = true
